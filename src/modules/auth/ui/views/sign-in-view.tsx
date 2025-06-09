@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 const SignInSchema = z.object({
   email: z.string().email(),
@@ -42,43 +43,51 @@ export const SignInView = () => {
   const onSubmit = (data: z.infer<typeof SignInSchema>) => {
     setError(null);
     setPending(true);
-    authClient.signIn.email(
-      {
-        email: data.email,
-        password: data.password,
-        callbackURL: "/",
+    toast.promise(
+    authClient.signIn.email({
+      email: data.email,
+      password: data.password,
+      callbackURL: "/",
+    }),
+    {
+      loading: 'Signing in...',
+      success: () => {
+        setPending(false);
+        router.push("/");
+        return 'Signed in successfully';
       },
-      {
-        onSuccess: () => {
-          setPending(false);
-          router.push("/");
-        },
-        onError: ({ error }) => {
-          setPending(false);
-          setError(error.message);
-        },
-      }
-    );
+      error: (error) => {
+        setPending(false);
+        setError(error.message);
+        return 'Failed to sign in';
+      },
+    }
+  );
   };
 
   const onSocial = (provider: "github" | "google") => {
     setError(null);
     setPending(true);
-    authClient.signIn.social(
-      {
-        provider: provider,
-        callbackURL: "/",
+    toast.promise(
+    authClient.signIn.social({
+      provider: provider,
+      callbackURL: "/",
+    }),
+    {
+
+      loading: "Signing in...",
+      success: () => {
+        setPending(false);
+        router.push("/");
+        return "Signed in with successfully";
       },
-      {
-        onSuccess: () => {
-          setPending(false);
-        },
-        onError: ({ error }) => {
-          setPending(false);
-          setError(error.message);
-        },
-      }
-    );
+      error: (error) => {
+        setPending(false);
+        setError(error.message);
+        return "Failed to sign in. Please try again";
+      },
+    }
+  );
   };
   return (
     <div className="flex flex-col gap-6">
@@ -138,7 +147,7 @@ export const SignInView = () => {
                   </Alert>
                 )}
                 <Button disabled={pending} type="submit" className="w-full">
-                  Sign In
+                  {pending ? 'Logging in...' : 'Sign In'}
                 </Button>
                 <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:z-0 after:top-1/2 after:flex after:items-center after:border-t">
                   <span className="bg-card text-muted-foreground relative z-10 px-2">
@@ -181,10 +190,10 @@ export const SignInView = () => {
               </div>
             </form>
           </Form>
-          <div className="bg-radial from-green-700 to-green-900 relative hidden md:flex flex-col gap-y-4 items-center justify-center">
+          <div className="bg-radial from-sidebar-accent to-sidebar relative hidden md:flex flex-col gap-y-4 items-center justify-center">
             <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
+              src="/logo.svg"
+              alt=" Logo"
               width={100}
               height={100}
             />
