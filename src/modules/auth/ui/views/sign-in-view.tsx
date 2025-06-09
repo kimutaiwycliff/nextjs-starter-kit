@@ -41,53 +41,52 @@ export const SignInView = () => {
   });
 
   const onSubmit = (data: z.infer<typeof SignInSchema>) => {
+    const toastId = toast.loading('Logging in...');
     setError(null);
     setPending(true);
-    toast.promise(
-    authClient.signIn.email({
-      email: data.email,
-      password: data.password,
-      callbackURL: "/",
-    }),
-    {
-      loading: 'Signing in...',
-      success: () => {
-        setPending(false);
-        router.push("/");
-        return 'Signed in successfully';
+    authClient.signIn.email(
+      {
+        email: data.email,
+        password: data.password,
+        callbackURL: "/",
       },
-      error: (error) => {
-        setPending(false);
-        setError(error.message);
-        return 'Failed to sign in';
-      },
-    }
-  );
+      {
+        onSuccess: () => {
+          setPending(false);
+          toast.success('Logged in successfully', { id: toastId });
+          router.push("/");
+        },
+        onError: ({ error }) => {
+          setPending(false);
+          toast.error('Failed to sign in. Please try again', { id: toastId });
+          setError(error.message);
+        },
+      }
+    );
   };
 
   const onSocial = (provider: "github" | "google") => {
+    const toastId = toast.loading('Logging in...');
     setError(null);
     setPending(true);
-    toast.promise(
-    authClient.signIn.social({
-      provider: provider,
-      callbackURL: "/",
-    }),
-    {
-
-      loading: "Signing in...",
-      success: () => {
-        setPending(false);
-        router.push("/");
-        return "Signed in with successfully";
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/",
       },
-      error: (error) => {
-        setPending(false);
-        setError(error.message);
-        return "Failed to sign in. Please try again";
-      },
-    }
-  );
+      {
+        onSuccess: () => {
+          setPending(false);
+          toast.success('Logged in successfully', { id: toastId });
+          router.push("/");
+        },
+        onError: ({ error }) => {
+          setPending(false);
+          setError(error.message);
+          toast.error('Failed to sign in. Please try again', { id: toastId });
+        },
+      }
+    );
   };
   return (
     <div className="flex flex-col gap-6">

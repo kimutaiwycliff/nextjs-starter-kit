@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 const SignUpSchema = z
   .object({
@@ -49,6 +50,7 @@ export const SignUpView = () => {
   });
 
   const onSubmit = (data: z.infer<typeof SignUpSchema>) => {
+    const toastId = toast.loading('Signing up...');
     setError(null);
     setPending(true);
     authClient.signUp.email(
@@ -61,10 +63,12 @@ export const SignUpView = () => {
       {
         onSuccess: () => {
           setPending(false);
+          toast.success(' Signed up successfully', { id: toastId });
           router.push("/");
         },
         onError: ({ error }) => {
           setPending(false);
+          toast.error('Failed to sign up. Please try again', { id: toastId });
           setError(error.message);
         },
       }
