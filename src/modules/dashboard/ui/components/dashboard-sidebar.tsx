@@ -17,10 +17,7 @@ import { NavUser } from './nav-user';
 import { authClient } from '@/lib/auth-client';
 
 export const DashboardSidebar = () => {
-  const { data: session, isPending } = authClient.useSession();
-  if (isPending || !session?.user) {
-    return null;
-  }
+  const { data: session } = authClient.useSession();
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="text-sidebar-accent-foreground">
@@ -42,7 +39,11 @@ export const DashboardSidebar = () => {
         <NavMain items={SidebarMenuItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={{ ...session.user, image: session.user.image ?? '' }} />
+        {session && (
+          <NavUser
+            user={{ ...session.user, image: session.user.image ?? '' }}
+          />
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -20,8 +20,8 @@ export const SidebarMenuItems = [
     icon: Home,
   },
   {
-    title: 'Inbox',
-    url: '/inbox',
+    title: 'Agents',
+    url: '/agents',
     icon: Inbox,
   },
   {
